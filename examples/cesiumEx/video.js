@@ -241,8 +241,8 @@ function createAppearance() {
       {
            czm_material material = czm_getDefaultMaterial(materialInput);
            vec2 st = materialInput.st;
-           vec4 colorImage = texture2D(image, vec2(st.s, st.t));
-           vec4 maskImage = texture2D(tmask, vec2(st.s, st.t));
+           vec4 colorImage = texture(image, vec2(st.s, st.t));
+           vec4 maskImage = texture(tmask, vec2(st.s, st.t));
            material.alpha = colorImage.a * color.a*maskImage.r;
            material.diffuse = colorImage.rgb*color.rgb;
            return material;

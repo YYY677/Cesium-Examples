@@ -1,5 +1,6 @@
 const Common = `
         uniform sampler2D heightMap;
+        uniform sampler2D maskMap;
         uniform float heightScale;
         uniform float maxElevation;
         uniform float minElevation;
@@ -40,6 +41,11 @@ const Common = `
         float height_map(vec2 p) {
             float f = texture(heightMap,p).r;
             return clamp(f, 0., 10.);
+        }
+
+        float mask_map(vec2 p) {
+            // 约定：maskMap.r > 0.5 代表“在多边形内”
+            return texture(maskMap, p).r;
         }
 
         const mat2 m = mat2(0.72, -1.60, 1.60, 0.72);
@@ -123,6 +129,7 @@ export default class Erosion extends Cesium.Primitive {
     this.minElevation = options.minElevation;
     this.heightMap = options.canvas;
     this.noise = options.noise;
+    this.mask = options.mask;
 
     this.coast2water_fadedepth = 0.1;
     this.large_waveheight = 0.5; // change to adjust the "heavy" waves
@@ -251,6 +258,12 @@ export default class Erosion extends Cesium.Primitive {
             light = vec3(-0., .0, 2.8); // position of the sun
             vec2 uv = v_st;
 
+            // 多边形裁剪：mask 外直接透明
+            if(mask_map(uv) < 0.5){
+                out_FragColor = vec4(0.0);
+                return;
+            }
+
             float deepwater_fadedepth = 0.5 + coast2water_fadedepth;
 
             float height = height_map(uv);
@@ -334,9 +347,37 @@ export default class Erosion extends Cesium.Primitive {
       }),
       source: this.noise,
     });
+
+    const defaultMask = (() => {
+      const c = document.createElement("canvas");
+      c.width = c.height = 1;
+      const ctx = c.getContext("2d");
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, 1, 1);
+      return c;
+    })();
+
+    const maskTex = new Cesium.Texture({
+      context: context,
+      width: 512.0,
+      height: 512.0,
+      pixelFormat: Cesium.PixelFormat.RGBA,
+      pixelDatatype: Cesium.PixelDatatype.UNSIGNED_BYTE,
+      flipY: true,
+      sampler: new Cesium.Sampler({
+        minificationFilter: Cesium.TextureMinificationFilter.LINEAR,
+        magnificationFilter: Cesium.TextureMagnificationFilter.LINEAR,
+        wrapS: Cesium.TextureWrap.CLAMP_TO_EDGE,
+        wrapT: Cesium.TextureWrap.CLAMP_TO_EDGE,
+      }),
+      source: this.mask || defaultMask,
+    });
     const uniformMap = {
       heightMap: () => {
         return texture;
+      },
+      maskMap: () => {
+        return maskTex;
       },
       heightScale: () => 1.0,
       minElevation: () => this.minElevation,
