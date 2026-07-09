@@ -54,6 +54,7 @@
     viewer.dataSources.add(myEntityCollection);
 
     axios
+      // 不提供示例数据
       .get("./tjp.json") //读取区域json
       .then((response) => {
         features = response.data.features;

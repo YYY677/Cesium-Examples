@@ -33,6 +33,7 @@
         // 开启帧率
         viewer.scene.debugShowFramesPerSecond = true;
 
+        // 不提供示例数据
         var promise = Cesium.GeoJsonDataSource.load('./geojson_mian.json', {
             clampToGround: true,   //贴地
             fill: Cesium.Color.PINK.withAlpha(0.6),
