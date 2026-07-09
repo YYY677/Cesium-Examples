@@ -24,7 +24,7 @@
         });
 
         var xyz = new Cesium.UrlTemplateImageryProvider({
-            "url": '//data.mars3d.cn/tile/img/{z}/{x}/{y}.jpg'
+            "url": 'https://t0.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=c1e7bf15c41cc47dc8889ebe2399ced4'
         })
         viewer.imageryLayers.addImageryProvider(xyz)
         // 开启帧率
@@ -32,7 +32,7 @@
 
         // var mvtLayer = mvt.create({
         //     url: 'https://a.tiles.mapbox.com/v4/mapbox.mapbox-streets-v6/{z}/{x}/{y}.vector.pbf?access_token={k}',
-        //     key: 'pk.eyJ1IjoidHJhbXBqd2wiLCJhIjoiY2xhYXIxbHExMDN3dzN3cGliOHdrMThxMiJ9.6er2aYb1EBjSsK1-t9d2-w',
+        //     key: 'pk.eyJ',
         //     style: mvt.StreetsV6Style
         // });
         // viewer.imageryLayers.addImageryProvider(mvtLayer)
